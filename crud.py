@@ -1,3 +1,5 @@
+from typing import Type
+
 from sqlalchemy.orm import Session
 
 from models import Roll
@@ -13,3 +15,12 @@ def add_roll(session: Session, length: float, weight: float) -> Roll:
     session.commit()
     session.refresh(roll)
     return roll
+
+
+def remove_roll(session: Session, roll_id: int) -> Type[Roll] | None:
+    roll = session.get(Roll, roll_id)
+    if roll:
+        session.delete(roll)
+        session.commit()
+        return roll
+    return None
