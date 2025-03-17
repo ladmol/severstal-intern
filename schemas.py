@@ -24,3 +24,9 @@ class RollFilter(BaseModel):
 class RollTime(BaseModel):
     start_date: datetime
     end_date: datetime
+
+class RollResponse(BaseModel):
+    id: int
+    length: float
+    weight: float
+    date_added: datetime
