@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import Optional, Tuple
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class RollCreate(BaseModel):
-    length: float
-    weight: float
+    length: float = Field(..., gt=0, description="Length must be greater than 0")
+    weight: float = Field(..., gt=0, description="Weight must be greater than 0")
 
 
 class RollDelete(BaseModel):
@@ -24,3 +24,32 @@ class RollFilter(BaseModel):
 class RollTime(BaseModel):
     start_date: datetime
     end_date: datetime
+
+
+class RollResponse(BaseModel):
+    id: int
+    length: float
+    weight: float
+    date_added: datetime
+
+
+class RollDeleted(RollResponse):
+    date_removed: datetime
+
+
+class RollFull(RollResponse):
+    date_removed: datetime | None = None
+
+
+class RollStatistics(BaseModel):
+    added_count: int
+    removed_count: int
+    average_length: float
+    average_weight: float
+    max_length: float
+    min_length: float
+    max_weight: float
+    min_weight: float
+    total_weight: float
+    max_time_diff: Optional[float] = None
+    min_time_diff: Optional[float] = None
