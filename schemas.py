@@ -35,3 +35,7 @@ class RollResponse(BaseModel):
 
 class RollDeleted(RollResponse):
     date_removed: datetime
+
+
+class RollFull(RollResponse):
+    date_removed: datetime | None = None

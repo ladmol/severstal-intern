@@ -1,12 +1,12 @@
-from typing import Generator, Annotated
+from typing import Generator, Annotated, List
 
 from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from fastapi import FastAPI, HTTPException
 
-from crud import add_roll, remove_roll
-from schemas import RollResponse, RollCreate, RollDelete, RollDeleted
+from crud import add_roll, remove_roll, filter_rolls
+from schemas import RollResponse, RollCreate, RollDelete, RollDeleted, RollFull, RollFilter
 from settings import settings
 
 engine = create_engine(str(settings.sqlalchemy_database_uri))
@@ -41,3 +41,11 @@ async def delete_roll(roll_delete: RollDelete, session: Session = Depends(get_db
     if roll:
         return roll
     raise HTTPException(status_code=404, detail="Roll not found")
+
+
+@app.post("/rolls/filter/", response_model=List[RollFull])
+async def get_filtered_rolls(roll_filter: RollFilter, session: Session = Depends(get_db)):
+    rolls = filter_rolls(session, roll_filter)
+    if not rolls:
+        raise HTTPException(status_code=404, detail="No rolls found with the given filters")
+    return rolls
