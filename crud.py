@@ -5,7 +5,7 @@ from typing import Type
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from models import Roll
-from schemas import RollFilter, RollCreate, RollDelete
+from schemas import RollFilter, RollCreate, RollDelete, RollTime
 
 
 def add_roll(session: Session, roll_create: RollCreate) -> Roll:
@@ -46,30 +46,30 @@ def filter_rolls(session: Session, roll_filter: RollFilter):
 
 
 def get_added_rolls_count(
-    session: Session, start_date: datetime, end_date: datetime
+        session: Session, roll_time: RollTime
 ) -> int:
     return (
         session.query(Roll)
-        .filter(Roll.date_added.between(start_date, end_date))
+        .filter(Roll.date_added.between(roll_time.start_date, roll_time.end_date))
         .count()
     )
 
 
 def get_removed_rolls_count(
-    session: Session, start_date: datetime, end_date: datetime
+        session: Session, roll_time: RollTime
 ) -> int:
     return (
         session.query(Roll)
-        .filter(Roll.date_removed.between(start_date, end_date))
+        .filter(Roll.date_removed.between(roll_time.start_date, roll_time.end_date))
         .count()
     )
 
 
 def get_average_length_and_weight(
-    session: Session, start_date: datetime, end_date: datetime
+        session: Session, roll_time: RollTime
 ) -> tuple:
     rolls = (
-        session.query(Roll).filter(Roll.date_added.between(start_date, end_date)).all()
+        session.query(Roll).filter(Roll.date_added.between(roll_time.start_date, roll_time.end_date)).all()
     )
     total_length = sum(roll.length for roll in rolls)
     total_weight = sum(roll.weight for roll in rolls)
@@ -78,10 +78,10 @@ def get_average_length_and_weight(
 
 
 def get_max_min_length_and_weight(
-    session: Session, start_date: datetime, end_date: datetime
+        session: Session, roll_time: RollTime
 ) -> tuple:
     rolls = (
-        session.query(Roll).filter(Roll.date_added.between(start_date, end_date)).all()
+        session.query(Roll).filter(Roll.date_added.between(roll_time.start_date, roll_time.end_date)).all()
     )
     max_length = max(roll.length for roll in rolls)
     min_length = min(roll.length for roll in rolls)
@@ -91,19 +91,19 @@ def get_max_min_length_and_weight(
 
 
 def get_total_weight(
-    session: Session, start_date: datetime, end_date: datetime
+        session: Session, roll_time: RollTime
 ) -> float:
     rolls = (
-        session.query(Roll).filter(Roll.date_added.between(start_date, end_date)).all()
+        session.query(Roll).filter(Roll.date_added.between(roll_time.start_date, roll_time.end_date)).all()
     )
     return sum(roll.weight for roll in rolls)
 
 
 def get_max_min_time_diff(
-    session: Session, start_date: datetime, end_date: datetime
+        session: Session, roll_time: RollTime
 ) -> tuple:
     rolls = (
-        session.query(Roll).filter(Roll.date_added.between(start_date, end_date)).all()
+        session.query(Roll).filter(Roll.date_added.between(roll_time.start_date, roll_time.end_date)).all()
     )
     time_diffs = [
         (roll.date_removed - roll.date_added).total_seconds()
@@ -112,13 +112,14 @@ def get_max_min_time_diff(
     ]
     return (max(time_diffs), min(time_diffs)) if time_diffs else (0, 0)
 
-def calculate_statistics(session: Session, start_date: datetime, end_date: datetime):
-    added_count = get_added_rolls_count(session, start_date, end_date)
-    removed_count = get_removed_rolls_count(session, start_date, end_date)
-    avg_length, avg_weight = get_average_length_and_weight(session, start_date, end_date)
-    max_length, min_length, max_weight, min_weight = get_max_min_length_and_weight(session, start_date, end_date)
-    total_weight = get_total_weight(session, start_date, end_date)
-    max_time_diff, min_time_diff = get_max_min_time_diff(session, start_date, end_date)
+
+def calculate_statistics(session: Session, roll_time: RollTime):
+    added_count = get_added_rolls_count(session, roll_time)
+    removed_count = get_removed_rolls_count(session, roll_time)
+    avg_length, avg_weight = get_average_length_and_weight(session, roll_time)
+    max_length, min_length, max_weight, min_weight = get_max_min_length_and_weight(session, roll_time)
+    total_weight = get_total_weight(session, roll_time)
+    max_time_diff, min_time_diff = get_max_min_time_diff(session, roll_time)
 
     return {
         "added_count": added_count,

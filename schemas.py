@@ -19,3 +19,8 @@ class RollFilter(BaseModel):
     weight: Optional[Tuple[float, float]] = None
     date_added: Optional[Tuple[datetime, datetime]] = None
     date_removed: Optional[Tuple[datetime, datetime]] = None
+
+
+class RollTime(BaseModel):
+    start_date: datetime
+    end_date: datetime
