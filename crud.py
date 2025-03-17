@@ -27,7 +27,7 @@ def add_roll(session: Session, length: float, weight: float) -> Roll:
 def remove_roll(session: Session, roll_id: int) -> Type[Roll] | None:
     roll = session.get(Roll, roll_id)
     if roll:
-        session.delete(roll)
+        roll.date_removed = datetime.now(timezone.utc)
         session.commit()
         return roll
     return None
