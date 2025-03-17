@@ -25,8 +25,13 @@ class RollTime(BaseModel):
     start_date: datetime
     end_date: datetime
 
+
 class RollResponse(BaseModel):
     id: int
     length: float
     weight: float
     date_added: datetime
+
+
+class RollDeleted(RollResponse):
+    date_removed: datetime

@@ -5,8 +5,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from fastapi import FastAPI, HTTPException
 
-from crud import add_roll
-from schemas import RollResponse, RollCreate
+from crud import add_roll, remove_roll
+from schemas import RollResponse, RollCreate, RollDelete, RollDeleted
 from settings import settings
 
 engine = create_engine(str(settings.sqlalchemy_database_uri))
@@ -34,3 +34,10 @@ async def create_roll(roll_create: RollCreate, session: Session = Depends(get_db
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
+@app.delete("/rolls/{roll_id}", response_model=RollDeleted)
+async def delete_roll(roll_delete: RollDelete, session: Session = Depends(get_db)):
+    roll = remove_roll(session, roll_delete)
+    if roll:
+        return roll
+    raise HTTPException(status_code=404, detail="Roll not found")
