@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from fastapi import FastAPI, HTTPException
 
 from crud import add_roll, remove_roll, filter_rolls, calculate_statistics
-from schemas import RollResponse, RollCreate, RollDelete, RollDeleted, RollFull, RollFilter, RollTime
+from schemas import RollResponse, RollCreate, RollDelete, RollDeleted, RollFull, RollFilter, RollTime, RollStatistics
 from settings import settings
 
 engine = create_engine(str(settings.sqlalchemy_database_uri))
@@ -50,7 +50,8 @@ async def get_filtered_rolls(roll_filter: RollFilter, session: Session = Depends
         raise HTTPException(status_code=404, detail="No rolls found with the given filters")
     return rolls
 
-@app.post("/rolls/statistics/", response_model=Dict[str, float])
+
+@app.post("/rolls/statistics/", response_model=RollStatistics)
 async def calculate_roll_statistics(roll_time: RollTime, session: Session = Depends(get_db)):
     try:
         stats = calculate_statistics(session, roll_time)

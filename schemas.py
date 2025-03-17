@@ -39,3 +39,16 @@ class RollDeleted(RollResponse):
 
 class RollFull(RollResponse):
     date_removed: datetime | None = None
+
+class RollStatistics(BaseModel):
+    added_count: int
+    removed_count: int
+    average_length: float
+    average_weight: float
+    max_length: float
+    min_length: float
+    max_weight: float
+    min_weight: float
+    total_weight: float
+    max_time_diff: Optional[float] = None
+    min_time_diff: Optional[float] = None

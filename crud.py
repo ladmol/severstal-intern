@@ -5,7 +5,7 @@ from typing import Type
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from models import Roll
-from schemas import RollFilter, RollCreate, RollDelete, RollTime
+from schemas import RollFilter, RollCreate, RollDelete, RollTime, RollStatistics
 
 
 def add_roll(session: Session, roll_create: RollCreate) -> Roll:
@@ -113,7 +113,7 @@ def get_max_min_time_diff(
     return (max(time_diffs), min(time_diffs)) if time_diffs else (0, 0)
 
 
-def calculate_statistics(session: Session, roll_time: RollTime):
+def calculate_statistics(session: Session, roll_time: RollTime) -> RollStatistics:
     added_count = get_added_rolls_count(session, roll_time)
     removed_count = get_removed_rolls_count(session, roll_time)
     avg_length, avg_weight = get_average_length_and_weight(session, roll_time)
@@ -121,16 +121,16 @@ def calculate_statistics(session: Session, roll_time: RollTime):
     total_weight = get_total_weight(session, roll_time)
     max_time_diff, min_time_diff = get_max_min_time_diff(session, roll_time)
 
-    return {
-        "added_count": added_count,
-        "removed_count": removed_count,
-        "average_length": avg_length,
-        "average_weight": avg_weight,
-        "max_length": max_length,
-        "min_length": min_length,
-        "max_weight": max_weight,
-        "min_weight": min_weight,
-        "total_weight": total_weight,
-        "max_time_diff": max_time_diff,
-        "min_time_diff": min_time_diff
-    }
+    return RollStatistics(
+        added_count=added_count,
+        removed_count=removed_count,
+        average_length=avg_length,
+        average_weight=avg_weight,
+        max_length=max_length,
+        min_length=min_length,
+        max_weight=max_weight,
+        min_weight=min_weight,
+        total_weight=total_weight,
+        max_time_diff=max_time_diff,
+        min_time_diff=min_time_diff
+    )
